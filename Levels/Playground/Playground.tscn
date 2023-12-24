@@ -1,0 +1,42 @@
+[gd_scene load_steps=5 format=3 uid="uid://dwqa2knuhghky"]
+
+[ext_resource type="Texture2D" uid="uid://c7rxd7kcred40" path="res://Art/AllSkyFree/AllSkyFree_Sky_EpicBlueSunset_Equirect.png" id="1_76jma"]
+
+[sub_resource type="PanoramaSkyMaterial" id="PanoramaSkyMaterial_bpyjl"]
+panorama = ExtResource("1_76jma")
+
+[sub_resource type="Sky" id="Sky_usd2h"]
+sky_material = SubResource("PanoramaSkyMaterial_bpyjl")
+
+[sub_resource type="Environment" id="Environment_ghfpn"]
+background_mode = 2
+sky = SubResource("Sky_usd2h")
+
+[node name="Playground" type="Node3D"]
+
+[node name="LevelGeo" type="Node3D" parent="."]
+
+[node name="Floor" type="CSGBox3D" parent="LevelGeo"]
+size = Vector3(200, 1, 200)
+
+[node name="Wall" type="CSGBox3D" parent="LevelGeo"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 100, 7.5, 0)
+size = Vector3(1, 15, 200)
+
+[node name="Wall2" type="CSGBox3D" parent="LevelGeo"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -100, 7.5, 0)
+size = Vector3(1, 15, 200)
+
+[node name="Wall3" type="CSGBox3D" parent="LevelGeo"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 7.5, 100)
+size = Vector3(200, 15, 1)
+
+[node name="Wall4" type="CSGBox3D" parent="LevelGeo"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 7.5, -100)
+size = Vector3(200, 15, 1)
+
+[node name="Camera3D" type="Camera3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -68, 30, 0)
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+environment = SubResource("Environment_ghfpn")

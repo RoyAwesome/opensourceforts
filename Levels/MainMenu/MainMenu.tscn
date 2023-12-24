@@ -1,0 +1,214 @@
+[gd_scene load_steps=3 format=3 uid="uid://lx60rjtj5xke"]
+
+[ext_resource type="Script" path="res://Levels/MainMenu/MainMenu.cs" id="1_measx"]
+[ext_resource type="ButtonGroup" uid="uid://8f58p418jiw3" path="res://Levels/MainMenu/MainMenuButtonToggles.tres" id="2_xddn5"]
+
+[node name="MainMenu" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_measx")
+
+[node name="VBoxContainer" type="VBoxContainer" parent="."]
+layout_mode = 1
+anchors_preset = 4
+anchor_top = 0.5
+anchor_bottom = 0.5
+offset_left = 50.0
+offset_top = 80.0
+offset_right = 174.0
+offset_bottom = 279.0
+grow_vertical = 2
+
+[node name="DisconnectFromServerButton" type="Button" parent="VBoxContainer"]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+text = "Disconnect"
+
+[node name="HostServerButton" type="Button" parent="VBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+toggle_mode = true
+button_group = ExtResource("2_xddn5")
+text = "Host Server"
+
+[node name="JoinServerButton" type="Button" parent="VBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+toggle_mode = true
+button_group = ExtResource("2_xddn5")
+text = "Join Server"
+
+[node name="OptionsButton" type="Button" parent="VBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+toggle_mode = true
+button_group = ExtResource("2_xddn5")
+text = "Options
+"
+
+[node name="ExitButton" type="Button" parent="VBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Exit"
+
+[node name="Label" type="Label" parent="."]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -417.0
+offset_top = -11.0
+offset_right = -335.0
+offset_bottom = 12.0
+grow_horizontal = 2
+grow_vertical = 2
+text = "Open Source Forts"
+
+[node name="HostServerPanel" type="Panel" parent="."]
+unique_name_in_owner = true
+visible = false
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -125.0
+offset_top = -119.0
+offset_right = 375.0
+offset_bottom = 256.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="HostServerPanel"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 5.0
+offset_top = 20.0
+offset_right = -5.0
+offset_bottom = -5.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Label" type="Label" parent="HostServerPanel/VBoxContainer"]
+layout_mode = 2
+text = "Host Game
+"
+horizontal_alignment = 1
+
+[node name="HBoxContainer" type="HBoxContainer" parent="HostServerPanel/VBoxContainer"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="HostServerPanel/VBoxContainer/HBoxContainer"]
+layout_mode = 2
+text = "Map: "
+
+[node name="MapOptionsList" type="OptionButton" parent="HostServerPanel/VBoxContainer/HBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="HBoxContainer2" type="HBoxContainer" parent="HostServerPanel/VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 10
+
+[node name="StartServerButton" type="Button" parent="HostServerPanel/VBoxContainer/HBoxContainer2"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 10
+text = "Host Server"
+
+[node name="JoinServerPanel" type="Panel" parent="."]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -125.0
+offset_top = -119.0
+offset_right = 375.0
+offset_bottom = 256.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="JoinServerPanel"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 5.0
+offset_top = 20.0
+offset_right = -5.0
+offset_bottom = -5.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Label" type="Label" parent="JoinServerPanel/VBoxContainer"]
+layout_mode = 2
+text = "Join Game
+"
+horizontal_alignment = 1
+
+[node name="HBoxContainer" type="HBoxContainer" parent="JoinServerPanel/VBoxContainer"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="JoinServerPanel/VBoxContainer/HBoxContainer"]
+layout_mode = 2
+text = "Host: "
+
+[node name="IPHostTextInput" type="TextEdit" parent="JoinServerPanel/VBoxContainer/HBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+placeholder_text = "IP or  Hostname"
+
+[node name="HBoxContainer3" type="HBoxContainer" parent="JoinServerPanel/VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 10
+
+[node name="DoConnectToServerButton" type="Button" parent="JoinServerPanel/VBoxContainer/HBoxContainer3"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 10
+text = "Join Server"
+
+[node name="OptionsPanel" type="Panel" parent="."]
+unique_name_in_owner = true
+visible = false
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -125.0
+offset_top = -119.0
+offset_right = 375.0
+offset_bottom = 256.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="OptionsPanel"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = 20.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Label" type="Label" parent="OptionsPanel/VBoxContainer"]
+layout_mode = 2
+text = "Options"
+horizontal_alignment = 1

@@ -1,0 +1,166 @@
+[gd_scene load_steps=6 format=3 uid="uid://cpwiq06t8o5h0"]
+
+[ext_resource type="Texture2D" uid="uid://cvgm3yar2baai" path="res://icon.svg" id="1_511k3"]
+[ext_resource type="Script" path="res://Gameplay/Core/LoadingScreen/LoadingScreen.cs" id="1_xnxbr"]
+
+[sub_resource type="Animation" id="Animation_8o80f"]
+resource_name = "FadeOut"
+length = 1.5
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("ColorRect/MapPreviewImage/VBoxContainer:modulate")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.4),
+"transitions": PackedFloat32Array(1, 2),
+"update": 0,
+"values": [Color(1, 1, 1, 1), Color(1, 1, 1, 0)]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("ColorRect:modulate")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(1, 1.5),
+"transitions": PackedFloat32Array(1, 3.605),
+"update": 0,
+"values": [Color(1, 1, 1, 1), Color(1, 1, 1, 0)]
+}
+
+[sub_resource type="Animation" id="Animation_2faq5"]
+length = 0.001
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("ColorRect/MapPreviewImage/VBoxContainer:modulate")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Color(1, 1, 1, 1)]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("ColorRect:modulate")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Color(1, 1, 1, 1)]
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_pfkpf"]
+_data = {
+"FadeOut": SubResource("Animation_8o80f"),
+"RESET": SubResource("Animation_2faq5")
+}
+
+[node name="LoadingScreen" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_xnxbr")
+
+[node name="ColorRect" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.211765, 0.239216, 0.321569, 1)
+
+[node name="MapPreviewImage" type="TextureRect" parent="ColorRect"]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+size_flags_vertical = 3
+texture = ExtResource("1_511k3")
+stretch_mode = 5
+
+[node name="VBoxContainer" type="VBoxContainer" parent="ColorRect/MapPreviewImage"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="ColorRect" type="ColorRect" parent="ColorRect/MapPreviewImage/VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+size_flags_stretch_ratio = 0.3
+color = Color(0, 0, 0, 1)
+
+[node name="HBoxContainer" type="HBoxContainer" parent="ColorRect/MapPreviewImage/VBoxContainer/ColorRect"]
+layout_mode = 1
+anchors_preset = 14
+anchor_top = 0.5
+anchor_right = 1.0
+anchor_bottom = 0.5
+offset_left = 7.0
+offset_top = -11.5
+offset_right = -8.0
+offset_bottom = 11.5
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Label" type="Label" parent="ColorRect/MapPreviewImage/VBoxContainer/ColorRect/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 10
+text = "Now Loading: "
+
+[node name="MapNameLabel" type="Label" parent="ColorRect/MapPreviewImage/VBoxContainer/ColorRect/HBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "MAPNAMEMAPNAME
+"
+
+[node name="Control" type="Control" parent="ColorRect/MapPreviewImage/VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="ColorRect2" type="ColorRect" parent="ColorRect/MapPreviewImage/VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+size_flags_stretch_ratio = 0.3
+color = Color(0, 0, 0, 1)
+
+[node name="HintTextLabel" type="Label" parent="ColorRect/MapPreviewImage/VBoxContainer/ColorRect2"]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -91.5
+offset_top = -11.5
+offset_right = 91.5
+offset_bottom = 11.5
+grow_horizontal = 2
+grow_vertical = 2
+text = "Loading Screen Hit Text
+"
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="."]
+unique_name_in_owner = true
+libraries = {
+"": SubResource("AnimationLibrary_pfkpf")
+}
