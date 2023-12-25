@@ -3,15 +3,20 @@ using System;
 
 public partial class LoadingScreen : Control
 {
-	Label HintTextLabel;
-	Label MapNameLabel;
-	TextureRect MapPreviewImage;
+	Label? HintTextLabel;
+	Label? MapNameLabel;
+	TextureRect? MapPreviewImage;
 
-	AnimationPlayer AnimationPlayer;
+	AnimationPlayer? AnimationPlayer;
+
+    public event Action? OnFadeOutComplete;
+
+	const string SlowFadeOut = "FadeOut";
+	const string FastFadeOut = "FadeOutFast";
 
 	public string HintText
 	{
-		get => HintTextLabel.Text;
+		get => HintTextLabel?.Text ?? "null";
 		set
 		{
 			if (HintTextLabel != null)
@@ -33,7 +38,7 @@ public partial class LoadingScreen : Control
 		}
 	}
 
-	public Texture2D MapPreview
+	public Texture2D? MapPreview
 	{
         get => MapPreviewImage?.Texture;
         set
@@ -59,12 +64,18 @@ public partial class LoadingScreen : Control
         MapPreviewImage = GetNode<TextureRect>("%MapPreviewImage");
 
 		AnimationPlayer = GetNode<AnimationPlayer>("AnimationPlayer");
+        AnimationPlayer.AnimationFinished += AnimationPlayer_AnimationFinished;
+
+		GD.Print($"LoadingScreen Ready {AnimationPlayer?.GetPath() ?? "Null"}");
 	}
 
-	private void ResetAnim()
-	{
-        AnimationPlayer.AnimationFinished -= AnimationPlayer_AnimationFinished;
-        AnimationPlayer.Play("RESET");
+
+    private void ResetAnim()
+	{		
+		if(AnimationPlayer != null)
+		{
+            AnimationPlayer.Play("RESET");
+        }
     }
 
 	public void ShowOverScene()
@@ -74,18 +85,32 @@ public partial class LoadingScreen : Control
         PlayingOut = false;
     }
 
-	public void RemoveFromScene()
+	public void FadeOutForPlay(bool Fast = true)
 	{
 		ResetAnim();
 
         PlayingOut = true;	
-        AnimationPlayer.AnimationFinished += AnimationPlayer_AnimationFinished;
-        AnimationPlayer.Play("FadeOut");
+		if(AnimationPlayer != null)
+		{			
+            AnimationPlayer.Play(Fast ? FastFadeOut : SlowFadeOut);
+        }
+		else
+		{
+			AnimationPlayer_AnimationFinished(Fast ? FastFadeOut : SlowFadeOut);
+		}
+
 	}
 
     private void AnimationPlayer_AnimationFinished(StringName animName)
     {
+		if(animName == "RESET")
+		{
+			return;
+		}
+
         PlayingOut = false;
 		Visible = false;
+
+		OnFadeOutComplete?.Invoke();
     }
 }

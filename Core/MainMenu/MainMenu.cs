@@ -3,27 +3,31 @@ using System;
 
 public partial class MainMenu : Control
 {
-    Button DisconnectFromServerButton;
-	Button JoinServerButton;
-	Button HostServerButton;
-	Button OptionsButton;
-	Button ExitButton;
+    Button? DisconnectFromServerButton;
+	Button? JoinServerButton;
+	Button? HostServerButton;
+	Button? OptionsButton;
+	Button? ExitButton;
 
-    Panel JoinGamePanel;
-    Panel HostGamePanel;
-    Panel OptionsPanel;
+    Panel? JoinGamePanel;
+    Panel? HostGamePanel;
+    Panel? OptionsPanel;
 
-    OptionButton MapList;
+    OptionButton? MapList;
 
-    TextEdit ServerAddressEntry;
+    TextEdit? ServerAddressEntry;
 
-    Button StartServerButton;
-    Button DoConnectToServerButton;
+    Button? StartServerButton;
+    Button? DoConnectToServerButton;
+
+    MultiplayerManager? MultiplayerManager;
 
 
 	// Called when the node enters the scene tree for the first time.
 	public override void _Ready()
 	{
+        MultiplayerManager = GetNode<MultiplayerManager>("/root/MultiplayerManager");
+
         DisconnectFromServerButton = GetNode<Button>("%DisconnectFromServerButton");
 		JoinServerButton = GetNode<Button>("%JoinServerButton");
         HostServerButton = GetNode<Button>("%HostServerButton");
@@ -60,12 +64,21 @@ public partial class MainMenu : Control
 
     private void DoConnectToServerButton_Pressed()
     {
-        GD.Print($"Connecting to Server {ServerAddressEntry.Text}");
+        GD.Print($"Connecting to Server {ServerAddressEntry?.Text ?? "null"}");
+        if(!MultiplayerManager?.TryConnectToServer(ServerAddressEntry?.Text ?? "") ?? true)
+        {
+            GD.PrintErr("Unable to connect to server");
+            return;
+        }
+        
+        
     }
 
     private void StartServerButton_Pressed()
     {
-        GD.Print($"Starting Server: {MapList.GetItemText(MapList.Selected)}");
+        GD.Print($"Starting Server: {MapList?.GetItemText(MapList.Selected)}");
+
+        MultiplayerManager?.HostServer();
     }
 
     private void ExitButton_Pressed()
@@ -75,14 +88,23 @@ public partial class MainMenu : Control
 
     private void OptionsButton_Toggled(bool toggledOn)
     {
+        if(OptionsPanel == null)
+        {
+            return;
+        }
         OptionsPanel.Visible = toggledOn;
     }
 
     private void HostServerButton_Toggled(bool toggledOn)
     {
+        if(HostGamePanel == null)
+        {
+            return;
+        }
+
         HostGamePanel.Visible = toggledOn;
 
-        if(toggledOn)
+        if(toggledOn && MapList != null)
         {
             MapList.Clear();
             var Maps = ProjectSettings.GetSettingWithOverride(GameSettings.MapListPath).AsStringArray();
@@ -95,6 +117,11 @@ public partial class MainMenu : Control
 
     private void JoinServerButton_Toggled(bool toggledOn)
     {
+        if (JoinGamePanel == null)
+        {
+            return;
+        }
+
        JoinGamePanel.Visible = toggledOn;
     }
 

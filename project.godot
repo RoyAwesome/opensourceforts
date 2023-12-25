@@ -15,7 +15,7 @@ Maps_Modes/Map_List=PackedStringArray("res://Levels/Playground/Playground.tscn")
 [application]
 
 config/name="OSSForts"
-run/main_scene="res://Levels/MainMenu/MainMenu.tscn"
+run/main_scene="res://Core/LoadingScreen/LoadingScreen.tscn"
 config/features=PackedStringArray("4.2", "C#", "Forward Plus")
 config/icon="res://icon.svg"
 
@@ -24,6 +24,7 @@ config/icon="res://icon.svg"
 GameSettings="*res://Globals/GameSettings.cs"
 MultiplayerManager="*res://Globals/MultiplayerManager.cs"
 SceneManager="*res://Globals/SceneManager.cs"
+CoroutineManager="*res://Globals/CoroutineManager.cs"
 
 [dotnet]
 

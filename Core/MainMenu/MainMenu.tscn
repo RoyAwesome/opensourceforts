@@ -1,7 +1,7 @@
 [gd_scene load_steps=3 format=3 uid="uid://lx60rjtj5xke"]
 
-[ext_resource type="Script" path="res://Levels/MainMenu/MainMenu.cs" id="1_measx"]
-[ext_resource type="ButtonGroup" uid="uid://8f58p418jiw3" path="res://Levels/MainMenu/MainMenuButtonToggles.tres" id="2_xddn5"]
+[ext_resource type="Script" path="res://Core/MainMenu/MainMenu.cs" id="1_measx"]
+[ext_resource type="ButtonGroup" uid="uid://8f58p418jiw3" path="res://Core/MainMenu/MainMenuButtonToggles.tres" id="2_xddn5"]
 
 [node name="MainMenu" type="Control"]
 layout_mode = 3
