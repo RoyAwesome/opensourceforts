@@ -1,0 +1,22 @@
+[remap]
+
+importer="wavefront_obj"
+importer_version=1
+type="Mesh"
+uid="uid://eikj3t6pd447"
+path="res://.godot/imported/ammo_sniper.obj-3bce37a46f6885869a7c35c1797171d7.mesh"
+
+[deps]
+
+files=["res://.godot/imported/ammo_sniper.obj-3bce37a46f6885869a7c35c1797171d7.mesh"]
+
+source_file="res://Art/Kenny/Weapons/ammo_sniper.obj"
+dest_files=["res://.godot/imported/ammo_sniper.obj-3bce37a46f6885869a7c35c1797171d7.mesh", "res://.godot/imported/ammo_sniper.obj-3bce37a46f6885869a7c35c1797171d7.mesh"]
+
+[params]
+
+generate_tangents=true
+scale_mesh=Vector3(10, 10, 10)
+offset_mesh=Vector3(0, 0, 0)
+optimize_mesh=true
+force_disable_mesh_compression=false

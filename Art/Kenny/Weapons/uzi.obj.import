@@ -1,0 +1,22 @@
+[remap]
+
+importer="wavefront_obj"
+importer_version=1
+type="Mesh"
+uid="uid://0wfa8hj5kbhn"
+path="res://.godot/imported/uzi.obj-b8e1ca3e6cec728fb1865c99606a1aaf.mesh"
+
+[deps]
+
+files=["res://.godot/imported/uzi.obj-b8e1ca3e6cec728fb1865c99606a1aaf.mesh"]
+
+source_file="res://Art/Kenny/Weapons/uzi.obj"
+dest_files=["res://.godot/imported/uzi.obj-b8e1ca3e6cec728fb1865c99606a1aaf.mesh", "res://.godot/imported/uzi.obj-b8e1ca3e6cec728fb1865c99606a1aaf.mesh"]
+
+[params]
+
+generate_tangents=true
+scale_mesh=Vector3(10, 10, 10)
+offset_mesh=Vector3(0, 0, 0)
+optimize_mesh=true
+force_disable_mesh_compression=false

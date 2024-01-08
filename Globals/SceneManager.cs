@@ -1,9 +1,11 @@
 using Godot;
 using OSSForts;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Runtime.InteropServices;
+using static System.Formats.Asn1.AsnWriter;
 
 public partial class SceneManager : Node
 {
@@ -12,31 +14,26 @@ public partial class SceneManager : Node
     Node? GameplayScene;
     LoadingScreen? LoadingScreen;
 
-    struct LoadingSceneInfo
-    {
-        public string Path;
-        public Node? Node;
-        public int LoadPercent;
-        public bool VisibleOnLoad;
-    }
+  
     Dictionary<string, PackedScene?> LoadedScenes = new();
 
-    List<LoadingSceneInfo> LoadingScenes = new();
-
-    List<Node> ScenesToMakeVisibleOnLoadingScreenComplete = new();
+    List<(Node Child, Node Parent)> ScenesToMakeVisibleOnLoadingScreenComplete = new();
 
     const string MainMenuPath = "res://Core/MainMenu/MainMenu.tscn";
+    const string GameplayHostPath = "res://Core/GameplayHost/GameplayHost.tscn";
     const string LandingScenePath = "";
 
 
     int ItemsHoldingLoadingScreen = 0;
+
+    GameplayHost? GameplayHost;
 
     public override void _Ready()
     {
         LoadingScreen = GetTree().Root.GetNode<LoadingScreen>("LoadingScreen");
         LoadingScreen.OnFadeOutComplete += MakeScenesVisible;
 
-       Coroutine.NextFrame(() =>
+        Coroutine.NextFrame(() =>
         {
             LoadingScreen.MapName = "Main Menu";
             LoadingScreen.HintText = "This is a game about forts";
@@ -46,106 +43,110 @@ public partial class SceneManager : Node
             var packedScene = GD.Load<PackedScene>(MainMenuPath);
 
             MainMenu = packedScene.Instantiate<MainMenu>();
-            ScenesToMakeVisibleOnLoadingScreenComplete.Add(MainMenu);
-            LoadingScreen.FadeOutForPlay();          
+            ScenesToMakeVisibleOnLoadingScreenComplete.Add((MainMenu, GetTree().Root.GetNode("/root")));
+            LoadingScreen.FadeOutForPlay();
 
-            //GoToScene(LandingScenePath);
+            var PackedGameplayHost = GD.Load<PackedScene>(GameplayHostPath);
+            GameplayHost = PackedGameplayHost.Instantiate<GameplayHost>();
+            GetTree().Root.AddChild(GameplayHost);
         });
 
         GD.Print($"SceneManager Ready {MainMenu?.GetPath() ?? "null"}");
-    }
-
-    private void SceneManager_ProcessFrame()
-    {
-        if(LoadingScenes.Count > 0)
-        {            
-            for (int i = 0; i < LoadingScenes.Count; i++)
-            {
-                if (ProcessSceneLoad(ref CollectionsMarshal.AsSpan(LoadingScenes)[i]))
-                {
-                    LoadingScenes.RemoveAt(i);
-                    i--;
-                }
-            }
-        }       
-    }
+    }  
 
     Godot.Collections.Array ProgressArray = new Godot.Collections.Array();
 
-    public void GoToScene(string path,bool ShowLoadingScreen = true, bool VisibleOnLoad = true)
+    private IEnumerator LoadMapCoro(string path, Node Root, bool ShowLoadingScreen = true, bool VisibleOnLoad = true)
     {
-        
         Error err = ResourceLoader.LoadThreadedRequest(path);
-        if(err != Error.Ok)
+
+
+        if (err != Error.Ok)
         {
             GD.PrintErr($"Failed to load scene {path}, Error: {err.ToString()}");
+            yield break;
+        }
+
+        if (ShowLoadingScreen && LoadingScreen != null)
+        {
+            LoadingScreen.ShowOverScene();
+            ItemsHoldingLoadingScreen++;
+
+            LoadingScreen.MapName = path;
+        }
+
+        ResourceLoader.ThreadLoadStatus Status;
+        do
+        {
+            Status = ResourceLoader.LoadThreadedGetStatus(path, ProgressArray);
+            switch (Status)
+            {
+                case ResourceLoader.ThreadLoadStatus.Failed:
+                    GD.PrintErr($"Failed to load scene {path}");
+                    yield break;
+
+                case ResourceLoader.ThreadLoadStatus.InvalidResource:
+                    GD.PrintErr($"Invalid resource {path}");
+                    yield break;
+                case ResourceLoader.ThreadLoadStatus.InProgress:
+                    //Update the loading screen if we're showing the loading screen
+                    if (ShowLoadingScreen)
+                    {
+                        //LoadingScreen?.Progr((int)ProgressArray[0]);
+                    }
+                    break;
+            }
+
+            yield return Wait.NextFrame();
+        } while (Status != ResourceLoader.ThreadLoadStatus.Loaded);
+
+        var Scene = ResourceLoader.LoadThreadedGet(path) as PackedScene;
+
+        
+        if (Scene != null)
+        {
+            LoadedScenes.Add(path, Scene);
+
+            if(ShowLoadingScreen)
+            {
+                ItemsHoldingLoadingScreen--;
+                if (ItemsHoldingLoadingScreen <= 0)
+                {
+                    LoadingScreen?.FadeOutForPlay();
+                }
+            }
+
+            var Node = Scene.Instantiate();
+
+            Root.AddChild(Node);
+
+            //if (VisibleOnLoad)
+            //{
+            //    ScenesToMakeVisibleOnLoadingScreenComplete.Add((Node, Root));
+            //}
+        }
+
+        yield break;
+    }
+
+    public void GoToGameplayScene(string path,bool ShowLoadingScreen = true, bool VisibleOnLoad = true)
+    {
+        if(GameplayHost == null)
+        {
+            GD.PrintErr("GameplayHost is null");
             return;
         }
 
-        var Status = ResourceLoader.LoadThreadedGetStatus(path, ProgressArray);
-        
-        switch (Status)
-        {
-            case ResourceLoader.ThreadLoadStatus.Failed:
-                GD.PrintErr($"Failed to load scene {path}");
-                return;
-           
-            case ResourceLoader.ThreadLoadStatus.InvalidResource:
-                GD.PrintErr($"Invalid resource {path}");
-                return;
-            case ResourceLoader.ThreadLoadStatus.InProgress:
-                LoadingSceneInfo sceneInfo = new();
-                sceneInfo.Path = path;
-                sceneInfo.LoadPercent = 0;
-                sceneInfo.VisibleOnLoad = VisibleOnLoad;
-                LoadingScenes.Add(sceneInfo);
-                if (ShowLoadingScreen)
-                {
-                    LoadingScreen?.ShowOverScene();
-                    ItemsHoldingLoadingScreen++;
-                }
-                break;
-            case ResourceLoader.ThreadLoadStatus.Loaded:
-                PackedScene? Scene = ResourceLoader.LoadThreadedGet(path) as PackedScene;
-                LoadedScenes.Add(path, Scene);
-                if(Scene != null)
-                {
-                    Coroutine.NextFrame(() =>
-                    {
-                        AddSceneToTree(Scene);
-                    });
-                }              
-                break;
-            default:
-                break;
-        }   
-
-     
-    }
-
-    private void AddSceneToTree(PackedScene Scene)
-    {
-        var Node = Scene.Instantiate();
-        ScenesToMakeVisibleOnLoadingScreenComplete.Add(Node);
-
-        ItemsHoldingLoadingScreen--;
-        if(ItemsHoldingLoadingScreen <=0)
-        {
-            LoadingScreen?.FadeOutForPlay();
-        }
+        Coroutine.Start(LoadMapCoro(path, GameplayHost, ShowLoadingScreen, VisibleOnLoad));     
     }
 
     private void MakeScenesVisible()
     {
-        foreach (Node n in ScenesToMakeVisibleOnLoadingScreenComplete)
+        foreach (var n in ScenesToMakeVisibleOnLoadingScreenComplete)
         {
-            GetTree().Root.AddChild(n);
+            n.Parent.AddChild(n.Child);
         }
     }
 
-    private bool ProcessSceneLoad(ref LoadingSceneInfo SceneInfo)
-    {
-        return false;
-    }
 
 }

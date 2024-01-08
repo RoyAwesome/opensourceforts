@@ -1,0 +1,22 @@
+[remap]
+
+importer="wavefront_obj"
+importer_version=1
+type="Mesh"
+uid="uid://b87jj33bc6it4"
+path="res://.godot/imported/uziGoldLong.obj-a932389f4c88c6c86351a02c78a530df.mesh"
+
+[deps]
+
+files=["res://.godot/imported/uziGoldLong.obj-a932389f4c88c6c86351a02c78a530df.mesh"]
+
+source_file="res://Art/Kenny/Weapons/uziGoldLong.obj"
+dest_files=["res://.godot/imported/uziGoldLong.obj-a932389f4c88c6c86351a02c78a530df.mesh", "res://.godot/imported/uziGoldLong.obj-a932389f4c88c6c86351a02c78a530df.mesh"]
+
+[params]
+
+generate_tangents=true
+scale_mesh=Vector3(10, 10, 10)
+offset_mesh=Vector3(0, 0, 0)
+optimize_mesh=true
+force_disable_mesh_compression=false

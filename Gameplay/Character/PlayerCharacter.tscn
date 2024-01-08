@@ -1,0 +1,20 @@
+[gd_scene load_steps=5 format=3 uid="uid://d4cjpuwmffayj"]
+
+[ext_resource type="Script" path="res://Gameplay/Character/PlayerCharacter.cs" id="1_8t2gp"]
+[ext_resource type="PackedScene" uid="uid://dyqeqp1t1nt1k" path="res://Art/Kenny/AdvancedCharacter/BlockyCharacterModel.tscn" id="1_t5044"]
+[ext_resource type="ArrayMesh" uid="uid://m2ggl2vtqugc" path="res://Art/Kenny/Weapons/shotgun.obj" id="2_24hwl"]
+
+[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_5q5fa"]
+
+[node name="PlayerCharacter" type="CharacterBody3D"]
+script = ExtResource("1_8t2gp")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
+shape = SubResource("CapsuleShape3D_5q5fa")
+
+[node name="Model" parent="." instance=ExtResource("1_t5044")]
+
+[node name="Shotgun" type="MeshInstance3D" parent="."]
+transform = Transform3D(0.999465, 0, -0.0327191, 0, 1, 0, 0.0327191, 0, 0.999465, 0.0309408, 1.12946, 0.461127)
+mesh = ExtResource("2_24hwl")

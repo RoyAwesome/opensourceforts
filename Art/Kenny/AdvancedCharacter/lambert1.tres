@@ -1,0 +1,10 @@
+[gd_resource type="StandardMaterial3D" load_steps=2 format=3 uid="uid://cmbxwlohgebk4"]
+
+[ext_resource type="Texture2D" uid="uid://ux5ghq1vngj1" path="res://Art/Kenny/AdvancedCharacter/skin_adventurer.png" id="1_wtdx4"]
+
+[resource]
+resource_name = "lambert1"
+albedo_color = Color(0.665185, 0.665185, 0.665185, 1)
+albedo_texture = ExtResource("1_wtdx4")
+metallic = 0.2
+roughness = 0.8

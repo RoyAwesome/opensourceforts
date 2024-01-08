@@ -1,0 +1,27 @@
+[gd_scene load_steps=6 format=3 uid="uid://dyqeqp1t1nt1k"]
+
+[ext_resource type="PackedScene" uid="uid://ce3ygt10pll3w" path="res://Art/Kenny/AdvancedCharacter/advancedCharacter.fbx" id="1_tynj0"]
+
+[sub_resource type="Animation" id="Animation_sjjsg"]
+resource_name = "Take 001"
+length = 0.001
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_547sx"]
+_data = {
+"Take 001": SubResource("Animation_sjjsg")
+}
+
+[sub_resource type="Animation" id="Animation_iew2v"]
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_cnukm"]
+_data = {
+"RESET": SubResource("Animation_iew2v")
+}
+
+[node name="Character" instance=ExtResource("1_tynj0")]
+
+[node name="AnimationPlayer" parent="." index="1"]
+libraries = {
+"": SubResource("AnimationLibrary_547sx"),
+"CustomAnims": SubResource("AnimationLibrary_cnukm")
+}

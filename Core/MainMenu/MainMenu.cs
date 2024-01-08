@@ -22,11 +22,15 @@ public partial class MainMenu : Control
 
     MultiplayerManager? MultiplayerManager;
 
+    SceneManager? SceneManager;
+       
+
 
 	// Called when the node enters the scene tree for the first time.
 	public override void _Ready()
 	{
         MultiplayerManager = GetNode<MultiplayerManager>("/root/MultiplayerManager");
+        SceneManager = GetNode<SceneManager>("/root/SceneManager");
 
         DisconnectFromServerButton = GetNode<Button>("%DisconnectFromServerButton");
 		JoinServerButton = GetNode<Button>("%JoinServerButton");
@@ -78,7 +82,17 @@ public partial class MainMenu : Control
     {
         GD.Print($"Starting Server: {MapList?.GetItemText(MapList.Selected)}");
 
-        MultiplayerManager?.HostServer();
+        if(MultiplayerManager == null || MapList == null || SceneManager == null)
+        {
+            GD.PrintErr("Unable to start server, null things");
+            return;
+        }
+
+        if (MultiplayerManager.HostServer())
+        {
+            Visible = false;
+            SceneManager.GoToGameplayScene(MapList.GetItemText(MapList.Selected));
+        }
     }
 
     private void ExitButton_Pressed()
