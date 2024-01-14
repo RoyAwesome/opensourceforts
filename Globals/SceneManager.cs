@@ -99,7 +99,7 @@ public partial class SceneManager : Node
 
             yield return Wait.NextFrame();
         } while (Status != ResourceLoader.ThreadLoadStatus.Loaded);
-
+       
         var Scene = ResourceLoader.LoadThreadedGet(path) as PackedScene;
 
         

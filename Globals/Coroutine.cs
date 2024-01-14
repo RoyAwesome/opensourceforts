@@ -1,6 +1,8 @@
-﻿using System;
+﻿using Godot;
+using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -66,6 +68,30 @@ public static class Wait
     {
         return new Timer(time);
     }
+
+    public static IEnumerable AsyncLoad(string asset)
+    {
+        throw new NotImplementedException();
+        //ResourceLoader.ThreadLoadStatus Status;
+        //do
+        //{
+        //    Status = ResourceLoader.LoadThreadedGetStatus(asset);
+        //    switch (Status)
+        //    {
+        //        case ResourceLoader.ThreadLoadStatus.Failed:
+        //            GD.PrintErr($"Failed to load asset {asset}");
+        //            yield break;
+
+        //        case ResourceLoader.ThreadLoadStatus.InvalidResource:
+        //            GD.PrintErr($"Invalid resource {asset}");
+        //            yield break;
+        //    }
+        //    if(Status != ResourceLoader.ThreadLoadStatus.Loaded)
+        //    {
+        //        yield return NextFrame();
+        //    }
+        //} while (Status != ResourceLoader.ThreadLoadStatus.Loaded);
+    }
 }
 
 public static class Coroutine
@@ -90,44 +116,90 @@ public static class Coroutine
             {
                 return false;
             }
-
-            var coro = Stack.Peek();
-            if(coro.Current == null)
+            
+            do
             {
-                coro.MoveNext();
-            }
-
-            if (coro.Current is ICoroutineWaiter waiter)
-            {
-                if (waiter.Terminate)
+                //Try to see if we have a corotuine to run.  If not, we break the loop.
+                if(Stack.TryPeek(out IEnumerator? coro))
                 {
-                    Stack.Pop();
-                }
-                else if (waiter.Ready)
-                {
-                    if (coro.MoveNext())
+                    //If our coro is waiting on a waiter, check if that waiter is ready.  If it is, move forward 
+                    if (coro.Current is ICoroutineWaiter waiter)
                     {
-                        if(coro.Current is IEnumerator sub_coro)
+                        //If we're done with this coro, pop off the top of the stack and see what we continue to next time around this loop.
+                        if (waiter.Terminate)
                         {
-                            Stack.Push(sub_coro);
+                            Stack.Pop();
                         }
-                        return true;
+
+                        if (waiter.Ready)
+                        {
+                            //Try to progress the coro.  If we progress, we come back around to see if the next part is a waiter.
+                            //It could be a subcoro, or something random.  Either way, try to find out whats next.
+                            //If we can't continue, we're done with this coro so see what the parent does. 
+                            if (!coro.MoveNext()) 
+                            {
+                                Stack.Pop();
+                            }
+                        }
+                        //If we're not ready, break the loop.  We'll come back around next frame.
+                        else
+                        {
+                            break;
+                        }
+                    }
+                    //If we have a subcoro, lets see what we've got for us in the coro.
+                    else if (coro.Current is IEnumerator sub_coro)
+                    {
+                        do
+                        {
+                            //If we're null, lets check if we can move forward.  If we can, push the subcoro onto the stack.
+                            if (sub_coro.Current == null)
+                            {
+                                if (sub_coro.MoveNext())
+                                {
+                                    Stack.Push(sub_coro);
+                                    break;
+                                }
+                                else
+                                {
+                                    //If we're over the end of the subcoro, just progress the parent and go back around the loop.
+                                    if(!coro.MoveNext())                                  
+                                    {
+                                        //If the parent is done, pop it off the stack.
+                                        Stack.Pop();
+                                    }
+                                    break;
+                                }
+                            }
+                            //If we have a value here, put the subcoro on the stack and go around the loop again (so it's checked).
+                            else if (sub_coro.Current is IEnumerator || sub_coro.Current is ICoroutineWaiter)
+                            {
+                                Stack.Push(sub_coro);
+                                break;
+                            }
+                            //if we're not a subcoro or a waiter, we're a value.  Progress the subcoro check what we get next.
+                            else
+                            {
+                                if (!sub_coro.MoveNext())
+                                {
+                                    break;
+                                }
+                            }
+                        } while (true);                     
+                       
                     }
                     else
                     {
                         Stack.Pop();
-                        if(Stack.TryPeek(out IEnumerator? parentCoro))
-                        {
-                            parentCoro.MoveNext();
-                            if (coro.Current is IEnumerator sub_coro)
-                            {
-                                Stack.Push(sub_coro);
-                            }
-                            return true;
-                        }
                     }
                 }
-            }           
+                else
+                {
+                    break;
+                }
+
+            } while (true);           
+           
 
             return Stack.Count != 0;
         }
@@ -136,7 +208,12 @@ public static class Coroutine
     private static Queue<Action> actions = new Queue<Action>();
 
     public static void Start(IEnumerator coroutine)
-    {
+    {        
+        if(!coroutine.MoveNext())
+        {
+            return;
+        }
+
         coroutineQueue.Add(new(coroutine));
     }
 
