@@ -36,7 +36,7 @@ jobs:
         uses: docker/build-push-action@v2.9.0
         with:
           context: .
-          file: Dockerfile
+          file: dockerfile
           push: true
           tags: |
             ghcr.io/${{ env.IMAGE_OWNER }}/${{ env.IMAGE_NAME }}:${{ github.event.inputs.version }}${{ env.IMAGE_TAG }}
@@ -69,7 +69,7 @@ jobs:
         uses: docker/build-push-action@v2.9.0
         with:
           context: .
-          file: mono.Dockerfile
+          file: mono.dockerfile
           push: true
           tags: |
             ghcr.io/${{ env.IMAGE_OWNER }}/${{ env.IMAGE_NAME }}:mono-${{ github.event.inputs.version }}${{ env.IMAGE_TAG }}
