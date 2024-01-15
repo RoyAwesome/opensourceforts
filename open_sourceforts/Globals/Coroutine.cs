@@ -20,6 +20,8 @@ public interface ICoroutineWaiter
     {
         get;
     }
+
+    void Progress();
 }
 
 public static class Wait
@@ -32,8 +34,13 @@ public static class Wait
         }
 
         public int Frames;
-        public bool Ready => Frames-- <= 0;
+        public bool Ready => Frames <= 0;
         public bool Terminate => false;
+
+        public void Progress()
+        {
+            Frames--;
+        }
     }
     public static ICoroutineWaiter Frames(int frames)
     {
@@ -57,6 +64,10 @@ public static class Wait
 
         public bool Ready => DateTime.Now >= End;
         public bool Terminate => false;
+
+        public void Progress()
+        {
+        }
     }
 
     public static ICoroutineWaiter ForSeconds(double time)
@@ -129,8 +140,8 @@ public static class Coroutine
                         if (waiter.Terminate)
                         {
                             Stack.Pop();
+                            continue;
                         }
-
                         if (waiter.Ready)
                         {
                             //Try to progress the coro.  If we progress, we come back around to see if the next part is a waiter.
@@ -139,13 +150,25 @@ public static class Coroutine
                             if (!coro.MoveNext()) 
                             {
                                 Stack.Pop();
+                                while(Stack.TryPeek(out IEnumerator? parent_coro))
+                                {
+                                    if(!parent_coro.MoveNext())
+                                    {
+                                        Stack.Pop();
+                                    }
+                                    else
+                                    {
+                                        break;
+                                    }
+                                }
                             }
                         }
                         //If we're not ready, break the loop.  We'll come back around next frame.
                         else
                         {
+                            waiter.Progress();
                             break;
-                        }
+                        }                        
                     }
                     //If we have a subcoro, lets see what we've got for us in the coro.
                     else if (coro.Current is IEnumerator sub_coro)

@@ -1,4 +1,6 @@
 using Godot;
+using OSSForts;
+using OSSForts.Globals;
 using System;
 
 public partial class MainMenu : Control
@@ -88,11 +90,14 @@ public partial class MainMenu : Control
             return;
         }
 
-        if (MultiplayerManager.HostServer())
-        {
-            Visible = false;
-            SceneManager.GoToGameplayScene(MapList.GetItemText(MapList.Selected));
-        }
+        Visible = false;
+        Coroutine.Start(NetworkGame.StartLocalNetworkGame(MultiplayerManager, MapList.GetItemText(MapList.Selected)));
+
+        //if (MultiplayerManager.HostServer())
+        //{
+        //    Visible = false;
+        //    SceneManager.GoToGameplayScene(MapList.GetItemText(MapList.Selected));
+        //}
     }
 
     private void ExitButton_Pressed()

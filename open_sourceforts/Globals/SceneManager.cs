@@ -12,8 +12,6 @@ public partial class SceneManager : Node
     MainMenu? MainMenu;
 
     Node? GameplayScene;
-    LoadingScreen? LoadingScreen;
-
   
     Dictionary<string, PackedScene?> LoadedScenes = new();
 
@@ -23,40 +21,41 @@ public partial class SceneManager : Node
     const string GameplayHostPath = "res://Core/GameplayHost/GameplayHost.tscn";
     const string LandingScenePath = "";
 
-
-    int ItemsHoldingLoadingScreen = 0;
-
     GameplayHost? GameplayHost;
+
+    private static SceneManager? _instance;
 
     public override void _Ready()
     {
-        LoadingScreen = GetTree().Root.GetNode<LoadingScreen>("LoadingScreen");
+        _instance = this;
         LoadingScreen.OnFadeOutComplete += MakeScenesVisible;
 
         Coroutine.NextFrame(() =>
         {
-            LoadingScreen.MapName = "Main Menu";
+            LoadingScreen.LoadingJob = "Main Menu";
             LoadingScreen.HintText = "This is a game about forts";
-            LoadingScreen.ShowOverScene();
+            LoadingScreen.ShowLoadingScreen(this);
 
             //Load the main menu        
             var packedScene = GD.Load<PackedScene>(MainMenuPath);
 
             MainMenu = packedScene.Instantiate<MainMenu>();
             ScenesToMakeVisibleOnLoadingScreenComplete.Add((MainMenu, GetTree().Root.GetNode("/root")));
-            LoadingScreen.FadeOutForPlay();
 
+            LoadingScreen.LoadingJob = "Initializing Gameplay Host";
             var PackedGameplayHost = GD.Load<PackedScene>(GameplayHostPath);
             GameplayHost = PackedGameplayHost.Instantiate<GameplayHost>();
             GetTree().Root.AddChild(GameplayHost);
+
+            LoadingScreen.ReleaseLoadingScreen(this);
         });
 
         GD.Print($"SceneManager Ready {MainMenu?.GetPath() ?? "null"}");
     }  
 
-    Godot.Collections.Array ProgressArray = new Godot.Collections.Array();
+    private static Godot.Collections.Array ProgressArray = new Godot.Collections.Array();
 
-    private IEnumerator LoadMapCoro(string path, Node Root, bool ShowLoadingScreen = true, bool VisibleOnLoad = true)
+    public static IEnumerator LoadMapCoro(string path, Node Root, bool ShowLoadingScreen = true, bool VisibleOnLoad = true)
     {
         Error err = ResourceLoader.LoadThreadedRequest(path);
 
@@ -67,15 +66,14 @@ public partial class SceneManager : Node
             yield break;
         }
 
-        if (ShowLoadingScreen && LoadingScreen != null)
+        if (ShowLoadingScreen)
         {
-            LoadingScreen.ShowOverScene();
-            ItemsHoldingLoadingScreen++;
+            LoadingScreen.ShowLoadingScreen(path);
 
-            LoadingScreen.MapName = path;
+            LoadingScreen.LoadingJob = path;
         }
 
-        ResourceLoader.ThreadLoadStatus Status;
+        ResourceLoader.ThreadLoadStatus Status;       
         do
         {
             Status = ResourceLoader.LoadThreadedGetStatus(path, ProgressArray);
@@ -92,11 +90,11 @@ public partial class SceneManager : Node
                     //Update the loading screen if we're showing the loading screen
                     if (ShowLoadingScreen)
                     {
-                        //LoadingScreen?.Progr((int)ProgressArray[0]);
+                        LoadingScreen.LoadingJob = $"Loading Scene: {path} : {ProgressArray[0]}%";
                     }
                     break;
             }
-
+           
             yield return Wait.NextFrame();
         } while (Status != ResourceLoader.ThreadLoadStatus.Loaded);
        
@@ -105,25 +103,23 @@ public partial class SceneManager : Node
         
         if (Scene != null)
         {
-            LoadedScenes.Add(path, Scene);
+            _instance?.LoadedScenes.Add(path, Scene);
 
-            if(ShowLoadingScreen)
-            {
-                ItemsHoldingLoadingScreen--;
-                if (ItemsHoldingLoadingScreen <= 0)
-                {
-                    LoadingScreen?.FadeOutForPlay();
-                }
-            }
-
+            LoadingScreen.LoadingJob = "Instantiating Scene";
             var Node = Scene.Instantiate();
 
-            Root.AddChild(Node);
-
-            //if (VisibleOnLoad)
-            //{
-            //    ScenesToMakeVisibleOnLoadingScreenComplete.Add((Node, Root));
-            //}
+            if (ShowLoadingScreen)
+            {
+                if (VisibleOnLoad)
+                {
+                    _instance?.ScenesToMakeVisibleOnLoadingScreenComplete.Add((Node, Root));
+                }
+                LoadingScreen.ReleaseLoadingScreen(path);
+            }        
+            else if(VisibleOnLoad)
+            {
+                Root.AddChild(Node);
+            }            
         }
 
         yield break;

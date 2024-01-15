@@ -46,6 +46,18 @@ public partial class MultiplayerManager : Node
 		get => CurrentMultiplayerMode == MultiplayerMode.Dedicated;
 	}
 
+	public bool AcceptingClients
+	{
+		get => IsServer && !Peer.RefuseNewConnections;
+		set
+		{
+			if(IsServer)
+			{				
+				Peer.RefuseNewConnections = !value;
+			}
+		}
+	}
+
 	public const int PORT = 25252;
 	const string PlayerControllerPath = "res://Gameplay/Player/PlayerController.tscn";
 
@@ -112,7 +124,6 @@ public partial class MultiplayerManager : Node
 
 		Multiplayer.ConnectionFailed += OnConnectionFailed;
 		Multiplayer.ServerDisconnected += OnServerDisconnected;
-
 		Multiplayer.ConnectedToServer += OnConnectedToServer;
 
 		GD.Print("Connecting to server...");
