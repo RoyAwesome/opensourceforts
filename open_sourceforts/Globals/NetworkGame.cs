@@ -12,13 +12,22 @@ public static class NetworkGame
 {
 
     public static IEnumerator StartLocalNetworkGame(MultiplayerManager MM, string MapPath)
-    {
+    {       
+        //Get the Gameplay Host
+        GameplayHost? Host = MM.GetTree().Root.GetNode<GameplayHost>("/root/GameplayHost");
+        if (Host == null)
+        {
+            GD.PrintErr("Failed to get GameplayHost");
+            yield break;
+        }
+
+        Host.GameState = GameplayState.Transiting;
+
         // Bring up the loading screen
         object handle = new();
         LoadingScreen.ShowLoadingScreen(handle);
         LoadingScreen.LoadingJob = "Starting Server";
-
-       
+               
         //Wait for the server to start
         if (!MM.HostServer())
         {
@@ -28,8 +37,7 @@ public static class NetworkGame
         }
         MM.AcceptingClients = false;
 
-        //Get the Gameplay Host
-        GameplayHost Host = MM.GetTree().Root.GetNode<GameplayHost>("/root/GameplayHost");
+       
 
         //Load the map
         yield return SceneManager.LoadMapCoro(MapPath, Host);
@@ -41,7 +49,8 @@ public static class NetworkGame
         LoadingScreen.ReleaseLoadingScreen(handle);
 
 
-        //Indicate that all is ready to the Gamemode
+        //Indicate that all is ready to the GameplayHost
+        Host.GameState = GameplayState.WaitingToStart;
     }
 
 }

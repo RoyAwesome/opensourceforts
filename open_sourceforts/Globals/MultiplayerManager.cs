@@ -16,6 +16,13 @@ public enum MultiplayerMode
 
 public partial class MultiplayerManager : Node
 {
+	public const string NodePath = "/root/MultiplayerManager";
+
+    public static MultiplayerManager Get(Node AnyNode)
+	{
+        return AnyNode.GetNode<MultiplayerManager>(NodePath);
+	}
+
 	public MultiplayerMode CurrentMultiplayerMode
 	{
 		get;
@@ -202,4 +209,12 @@ public partial class MultiplayerManager : Node
 
 		return PC;
     }
+
+	public IEnumerable<PlayerController> AllPlayers()
+	{
+		foreach(var player in Players.Values)
+		{
+            yield return player;
+        }
+	}
 }
